@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0f172a">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>AR Recruitment Scorecard</title>
   <style>
     :root {
@@ -515,17 +518,19 @@
       bottom: 24px;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--gray-900);
+      background: var(--accent);
       color: white;
-      padding: 12px 20px;
+      padding: 14px 22px;
       border-radius: 10px;
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 14px;
+      font-weight: 700;
       box-shadow: var(--shadow-lg);
       z-index: 100;
       opacity: 0;
       transition: opacity 0.2s, transform 0.2s;
       pointer-events: none;
+      max-width: 90vw;
+      text-align: center;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
   </style>
@@ -586,7 +591,8 @@
           </div>
         </div>
 
-        <button class="btn btn-primary" onclick="startInterview()">Iniciar evaluación →</button>
+        <button class="btn btn-primary" onclick="safeStartInterview()">Iniciar evaluación →</button>
+        <div style="text-align:center; font-size:10px; color:var(--gray-400); margin-top:12px;">v4 · 2026-05-19</div>
       </div>
     </div>
 
@@ -684,6 +690,17 @@
 
   <script>
     // ============== Supabase config ==============
+    // Global error handler so silent JS errors become visible
+    window.addEventListener('error', (e) => {
+      console.error('Global error:', e.error || e.message);
+      const t = document.getElementById('toast');
+      if (t) {
+        t.textContent = 'JS Error: ' + (e.message || 'unknown');
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 5000);
+      }
+    });
+
     const SUPA_URL = 'https://xwxjutaqouaeocvxawlw.supabase.co';
     const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3eGp1dGFxb3VhZW9jdnhhd2x3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTIxMzYsImV4cCI6MjA5MjYyODEzNn0.TOigRbaNL5z3Q7hd4llJyqrC6vZwn_-1R-5JudXtJmU';
     const SUPA_HEADERS = { apikey: SUPA_ANON, Authorization: `Bearer ${SUPA_ANON}`, 'Content-Type': 'application/json' };
@@ -777,6 +794,15 @@
       document.querySelectorAll('#intake-location .pill-btn').forEach(b => {
         b.classList.toggle('active', b.dataset.loc === loc);
       });
+    }
+
+    function safeStartInterview() {
+      try {
+        startInterview();
+      } catch (e) {
+        console.error('startInterview error:', e);
+        alert('Error al iniciar: ' + (e && e.message ? e.message : e) + '\n\nManda screenshot de este mensaje a Saúl.');
+      }
     }
 
     function startInterview() {
