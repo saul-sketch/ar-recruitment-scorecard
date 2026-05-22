@@ -513,26 +513,8 @@
 <body>
   <div class="app-shell">
 
-    <!-- ============== LOGIN ============== -->
-    <div class="screen active" id="screen-login">
-      <div class="login-card">
-        <div class="login-title">Recruitment Scorecard</div>
-        <div class="login-sub">Auto Republic — entrevistas para vendedores</div>
-        <div class="field">
-          <label class="field-label">Usuario<span class="req">*</span></label>
-          <input type="text" id="login-user" class="field-input" autocomplete="username" autocapitalize="off">
-        </div>
-        <div class="field">
-          <label class="field-label">Contraseña<span class="req">*</span></label>
-          <input type="password" id="login-pass" class="field-input" autocomplete="current-password" onkeydown="if(event.key==='Enter') tryLogin()">
-        </div>
-        <button class="btn btn-primary" onclick="tryLogin()" id="login-btn">Iniciar sesión</button>
-        <div class="login-error" id="login-error" style="display:none;"></div>
-      </div>
-    </div>
-
     <!-- ============== APP HEADER + INTAKE ============== -->
-    <div class="screen" id="screen-app">
+    <div class="screen active" id="screen-app">
       <div class="topbar" style="margin:-22px -18px 22px;">
         <div class="brand">
           <div class="brand-mark">AR</div>
@@ -541,15 +523,18 @@
             <small id="header-date">—</small>
           </div>
         </div>
-        <div class="user-chip">
-          <span id="header-user">—</span>
-          <button onclick="logout()" title="Cerrar sesión">×</button>
-        </div>
       </div>
 
       <div class="intake-card">
         <div class="intake-title">Nueva entrevista</div>
         <div class="intake-sub">Datos del candidato. La fecha se carga automática (hoy).</div>
+
+        <div class="field">
+          <label class="field-label">Entrevistador<span class="req">*</span></label>
+          <select id="intake-interviewer" class="field-select" onchange="onInterviewerChange()">
+            <option value="">Cargando…</option>
+          </select>
+        </div>
 
         <div class="field">
           <label class="field-label">Nombre del candidato<span class="req">*</span></label>
@@ -666,7 +651,6 @@
 
       <div style="max-width:380px; margin:0 auto; width:100%; padding:0 18px;">
         <button class="btn btn-primary" onclick="newInterview()">+ Nueva entrevista</button>
-        <button class="btn btn-secondary" onclick="logout()" style="margin-top:10px;">Cerrar sesión</button>
       </div>
     </div>
 
@@ -709,72 +693,44 @@
     ];
 
     // ============== State ==============
-    let currentUser = null;
-    let interview = null;       // { candidateName, location, duration, questionOrder: [...], scores: {qid: score} }
+    let currentUser = null;       // selected interviewer (no auth)
+    let managersList = [];         // list of managers fetched from app_users
+    let interview = null;
     let currentQuestionIdx = 0;
-    let questionOrder = [];     // array of question objects in display order
+    let questionOrder = [];
 
     // ============== Boot ==============
-    document.addEventListener('DOMContentLoaded', () => {
-      const u = localStorage.getItem('ar_rs_user');
-      if (u) {
-        currentUser = u;
-        showApp();
-      }
+    document.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('header-date').textContent = formatToday();
+      document.getElementById('intake-date').value = formatToday();
+      await loadManagers();
     });
+
+    async function loadManagers() {
+      try {
+        const res = await fetch(`${SUPA_URL}/rest/v1/app_users?select=name&order=name.asc`, { headers: SUPA_HEADERS });
+        const data = await res.json();
+        managersList = Array.isArray(data) ? data.map(u => u.name) : [];
+      } catch (e) {
+        managersList = [];
+      }
+      const sel = document.getElementById('intake-interviewer');
+      const last = localStorage.getItem('ar_rs_interviewer') || '';
+      sel.innerHTML = '<option value="">Seleccionar…</option>' +
+        managersList.map(n => `<option value="${escapeAttr(n)}" ${n === last ? 'selected' : ''}>${escapeHtml(n)}</option>`).join('');
+      if (last && managersList.includes(last)) currentUser = last;
+    }
+
+    function onInterviewerChange() {
+      const v = document.getElementById('intake-interviewer').value;
+      currentUser = v || null;
+      if (v) localStorage.setItem('ar_rs_interviewer', v);
+    }
 
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
       window.scrollTo({ top: 0, behavior: 'instant' });
-    }
-
-    // ============== Login ==============
-    async function tryLogin() {
-      const user = document.getElementById('login-user').value.trim();
-      const pass = document.getElementById('login-pass').value;
-      const errEl = document.getElementById('login-error');
-      errEl.style.display = 'none';
-      if (!user || !pass) {
-        errEl.textContent = 'Completa usuario y contraseña';
-        errEl.style.display = 'block';
-        return;
-      }
-      const btn = document.getElementById('login-btn');
-      btn.disabled = true; btn.textContent = 'Verificando…';
-      try {
-        const res = await fetch(`${SUPA_URL}/rest/v1/app_users?name=eq.${encodeURIComponent(user)}&password=eq.${encodeURIComponent(pass)}&select=name`, { headers: SUPA_HEADERS });
-        const data = await res.json();
-        if (!Array.isArray(data) || !data.length) {
-          errEl.textContent = 'Usuario o contraseña incorrectos';
-          errEl.style.display = 'block';
-          btn.disabled = false; btn.textContent = 'Iniciar sesión';
-          return;
-        }
-        currentUser = data[0].name;
-        localStorage.setItem('ar_rs_user', currentUser);
-        showApp();
-      } catch (e) {
-        errEl.textContent = 'Error de red: ' + e.message;
-        errEl.style.display = 'block';
-        btn.disabled = false; btn.textContent = 'Iniciar sesión';
-      }
-    }
-
-    function logout() {
-      if (!confirm('¿Cerrar sesión?')) return;
-      localStorage.removeItem('ar_rs_user');
-      currentUser = null;
-      document.getElementById('login-user').value = '';
-      document.getElementById('login-pass').value = '';
-      showScreen('screen-login');
-    }
-
-    function showApp() {
-      document.getElementById('header-user').textContent = currentUser;
-      document.getElementById('header-date').textContent = formatToday();
-      document.getElementById('intake-date').value = formatToday();
-      showScreen('screen-app');
     }
 
     function formatToday() {
@@ -799,7 +755,12 @@
     function startInterview() {
       const name = document.getElementById('intake-name').value.trim();
       const duration = parseInt(document.getElementById('intake-duration').value) || null;
+      const interviewer = document.getElementById('intake-interviewer').value;
       let valid = true;
+      if (!interviewer) {
+        document.getElementById('intake-interviewer').classList.add('invalid');
+        valid = false;
+      } else { document.getElementById('intake-interviewer').classList.remove('invalid'); }
       if (!name) {
         document.getElementById('intake-name').classList.add('invalid');
         valid = false;
@@ -812,6 +773,8 @@
         toast('Completa los campos requeridos');
         return;
       }
+      currentUser = interviewer;
+      localStorage.setItem('ar_rs_interviewer', interviewer);
       // Build random order for first 8, then fixed 9-10
       const shuffled = [...QUESTIONS_RANDOM].sort(() => Math.random() - 0.5);
       questionOrder = [...shuffled, ...QUESTIONS_FIXED];
@@ -982,13 +945,15 @@
       document.getElementById('intake-name').value = '';
       document.getElementById('intake-duration').value = '';
       document.querySelectorAll('#intake-location .pill-btn').forEach(b => b.classList.remove('active'));
-      showApp();
+      // Keep interviewer dropdown with last selection (already loaded)
+      showScreen('screen-app');
     }
 
     // ============== Utils ==============
     function escapeHtml(s) {
       return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
+    function escapeAttr(s) { return String(s || '').replace(/"/g, '&quot;'); }
     function toast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
