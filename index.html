@@ -678,6 +678,8 @@
     const BENCHMARK_PASS = 35;       // ≥35/50 → pasa
     const BENCHMARK_BORDERLINE = 28;  // 28–34 → borderline (Saúl decide)
     const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1507469284299903036/0XkuWm9jSZSRjCZkYv4xn5mqS_E-Gk2Eeu_fOc9HxUMLCpLxIsipzzHzEt9lepUULBW8';
+    const DISCORD_USER_HEADHUNTER = '1467993058158186678';
+    const DISCORD_USER_SAUL = '1242195465760542723';
 
     // ============== Questions (8 random + 2 fixed at end) ==============
     const QUESTIONS_RANDOM = [
@@ -980,7 +982,23 @@
 
       const dateNice = new Date().toLocaleDateString('es-ES', { day:'numeric', month:'long', year:'numeric' });
 
+      // Mention strategy:
+      //  PASS       → headhunter + Saúl (coordinar agendar)
+      //  BORDERLINE → headhunter + Saúl (Saúl decide)
+      //  FAIL       → solo headhunter (no molestar a Saúl)
+      let mentionIds = [];
+      let mentionText = '';
+      if (verdict.cssClass === 'pass' || verdict.cssClass === 'borderline') {
+        mentionIds = [DISCORD_USER_HEADHUNTER, DISCORD_USER_SAUL];
+        mentionText = `<@${DISCORD_USER_HEADHUNTER}> <@${DISCORD_USER_SAUL}>`;
+      } else {
+        mentionIds = [DISCORD_USER_HEADHUNTER];
+        mentionText = `<@${DISCORD_USER_HEADHUNTER}>`;
+      }
+
       const body = {
+        content: mentionText,
+        allowed_mentions: { users: mentionIds },
         embeds: [{
           title: `${emojiMap[verdict.cssClass]} Nueva entrevista — ${payload.candidate_name}`,
           color: colorMap[verdict.cssClass] || 1102505,
