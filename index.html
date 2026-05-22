@@ -551,9 +551,15 @@
           </select>
         </div>
 
-        <div class="field">
-          <label class="field-label">Nombre del candidato<span class="req">*</span></label>
-          <input type="text" id="intake-name" class="field-input" placeholder="Nombre y apellido" autocapitalize="words">
+        <div class="row-2">
+          <div class="field">
+            <label class="field-label">Nombre del candidato<span class="req">*</span></label>
+            <input type="text" id="intake-name" class="field-input" placeholder="Nombre y apellido" autocapitalize="words">
+          </div>
+          <div class="field">
+            <label class="field-label">Edad<span class="req">*</span></label>
+            <input type="number" id="intake-age" class="field-input" placeholder="25" min="16" max="99" inputmode="numeric">
+          </div>
         </div>
 
         <div class="field">
@@ -635,6 +641,7 @@
 
       <div class="meta-card" id="meta-card">
         <div class="row"><span>Candidato</span><span id="meta-name">—</span></div>
+        <div class="row"><span>Edad</span><span id="meta-age">—</span></div>
         <div class="row"><span>Locación</span><span id="meta-loc">—</span></div>
         <div class="row"><span>Entrevistador</span><span id="meta-interviewer">—</span></div>
         <div class="row"><span>Duración</span><span id="meta-duration">—</span></div>
@@ -769,6 +776,8 @@
 
     function startInterview() {
       const name = document.getElementById('intake-name').value.trim();
+      const ageRaw = document.getElementById('intake-age').value;
+      const age = ageRaw ? parseInt(ageRaw) : null;
       const duration = parseInt(document.getElementById('intake-duration').value) || null;
       const interviewer = document.getElementById('intake-interviewer').value;
       let valid = true;
@@ -780,6 +789,10 @@
         document.getElementById('intake-name').classList.add('invalid');
         valid = false;
       } else { document.getElementById('intake-name').classList.remove('invalid'); }
+      if (!age || age < 16 || age > 99) {
+        document.getElementById('intake-age').classList.add('invalid');
+        valid = false;
+      } else { document.getElementById('intake-age').classList.remove('invalid'); }
       if (!selectedLocation) {
         document.getElementById('intake-location').style.outline = '2px solid var(--accent)';
         valid = false;
@@ -796,13 +809,14 @@
 
       interview = {
         candidateName: name,
+        age,
         location: selectedLocation,
         duration,
         scores: {},
         startTime: Date.now()
       };
       currentQuestionIdx = 0;
-      document.getElementById('header-candidate-name').innerHTML = name + '<small>' + selectedLocation + '</small>';
+      document.getElementById('header-candidate-name').innerHTML = name + '<small>' + age + ' años · ' + selectedLocation + '</small>';
       document.getElementById('header-loc').textContent = selectedLocation;
       renderQuestion();
       showScreen('screen-question');
@@ -875,6 +889,7 @@
       document.getElementById('summary-verdict').textContent = verdict.label;
 
       document.getElementById('meta-name').textContent = interview.candidateName;
+      document.getElementById('meta-age').textContent = interview.age ? interview.age + ' años' : '—';
       document.getElementById('meta-loc').textContent = interview.location;
       document.getElementById('meta-interviewer').textContent = currentUser;
       document.getElementById('meta-duration').textContent = interview.duration ? interview.duration + ' min' : '—';
@@ -924,6 +939,7 @@
 
       const payload = {
         candidate_name: interview.candidateName,
+        age: interview.age,
         interview_date: todayISO(),
         location: interview.location,
         interviewer: currentUser,
@@ -1004,6 +1020,7 @@
           color: colorMap[verdict.cssClass] || 1102505,
           fields: [
             { name: 'Score', value: `**${payload.total_score}/50** · ${verdictLabel[verdict.cssClass]}`, inline: false },
+            { name: 'Edad', value: payload.age ? `${payload.age} años` : '—', inline: true },
             { name: 'Locación', value: payload.location, inline: true },
             { name: 'Entrevistador', value: payload.interviewer, inline: true },
             { name: 'Duración', value: payload.duration_minutes ? `${payload.duration_minutes} min` : '—', inline: true },
@@ -1026,6 +1043,7 @@
       currentQuestionIdx = 0;
       selectedLocation = null;
       document.getElementById('intake-name').value = '';
+      document.getElementById('intake-age').value = '';
       document.getElementById('intake-duration').value = '';
       document.querySelectorAll('#intake-location .pill-btn').forEach(b => b.classList.remove('active'));
       // Keep interviewer dropdown with last selection (already loaded)
