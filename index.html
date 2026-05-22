@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f172a">
+  <title>AR Recruitment Scorecard</title>
+  <style>
+    :root {
+      --primary: #0f172a;
+      --accent: #e94560;
+      --green: #10b981;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --blue: #3b82f6;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      min-height: 100vh;
+      min-height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .app-shell {
+      max-width: 720px;
+      margin: 0 auto;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top bar */
+    .topbar {
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .brand-text {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.1px;
+      line-height: 1.2;
+    }
+    .brand-text small {
+      font-weight: 500;
+      color: var(--gray-500);
+      font-size: 11px;
+      display: block;
+    }
+    .user-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: var(--gray-100);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+    .user-chip button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--gray-500);
+      font-size: 14px;
+      padding: 0;
+      line-height: 1;
+    }
+
+    /* Screens */
+    .screen { display: none; flex: 1; padding: 22px 18px 32px; }
+    .screen.active { display: flex; flex-direction: column; }
+
+    /* Login */
+    .login-card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px 24px;
+      box-shadow: var(--shadow-lg);
+      max-width: 380px;
+      margin: 40px auto;
+      width: 100%;
+    }
+    .login-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: var(--primary);
+    }
+    .login-sub {
+      color: var(--gray-500);
+      font-size: 14px;
+      margin-bottom: 22px;
+    }
+    .field { margin-bottom: 14px; }
+    .field-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray-600);
+      margin-bottom: 6px;
+    }
+    .field-label .req { color: var(--accent); margin-left: 2px; }
+    .field-label .opt { color: var(--gray-400); font-weight: 500; text-transform: none; margin-left: 6px; font-size: 11px; letter-spacing: 0; }
+    .field-input, .field-select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: inherit;
+      background: white;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -webkit-appearance: none;
+    }
+    .field-input:focus, .field-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15,23,42,0.1);
+    }
+    .field-input.invalid, .field-select.invalid {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(233,69,96,0.1);
+    }
+    .btn {
+      width: 100%;
+      padding: 13px 18px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.15s, transform 0.05s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-secondary { background: var(--gray-100); color: var(--gray-700); }
+    .btn-secondary:hover { background: var(--gray-200); }
+    .btn-success { background: var(--green); color: white; }
+    .btn-danger { background: var(--accent); color: white; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .login-error {
+      background: #fef2f2;
+      color: var(--accent);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-top: 12px;
+      border: 1px solid #fecaca;
+    }
+
+    /* Intake (candidate info) */
+    .intake-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+    .intake-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      letter-spacing: -0.2px;
+    }
+    .intake-sub {
+      color: var(--gray-500);
+      font-size: 13px;
+      margin-bottom: 22px;
+    }
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .pill-group {
+      display: flex;
+      gap: 8px;
+      background: var(--gray-100);
+      padding: 4px;
+      border-radius: 12px;
+    }
+    .pill-btn {
+      flex: 1;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 9px;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--gray-600);
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .pill-btn.active {
+      background: white;
+      color: var(--primary);
+      box-shadow: var(--shadow);
+    }
+
+    /* Question screen */
+    .progress-bar {
+      height: 6px;
+      background: var(--gray-200);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+    .q-counter {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gray-500);
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .q-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px 22px 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+    .q-title {
+      font-size: 19px;
+      font-weight: 800;
+      line-height: 1.3;
+      margin-bottom: 10px;
+      letter-spacing: -0.2px;
+    }
+    .q-explain {
+      color: var(--gray-500);
+      font-size: 14px;
+      line-height: 1.45;
+      margin-bottom: 22px;
+    }
+    .score-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+    .score-btn {
+      padding: 18px 6px 12px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .score-btn:active { transform: scale(0.96); }
+    .score-btn .num {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--gray-700);
+      line-height: 1;
+    }
+    .score-btn .lbl {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .score-btn.active {
+      border-color: var(--primary);
+      background: var(--gray-100);
+      box-shadow: 0 0 0 3px rgba(15,23,42,0.08);
+    }
+    .score-btn.score-1.active { border-color: #ef4444; background: #fef2f2; }
+    .score-btn.score-1.active .num { color: #ef4444; }
+    .score-btn.score-2.active { border-color: #f97316; background: #fff7ed; }
+    .score-btn.score-2.active .num { color: #f97316; }
+    .score-btn.score-3.active { border-color: #f59e0b; background: #fffbeb; }
+    .score-btn.score-3.active .num { color: #f59e0b; }
+    .score-btn.score-4.active { border-color: #84cc16; background: #f7fee7; }
+    .score-btn.score-4.active .num { color: #84cc16; }
+    .score-btn.score-5.active { border-color: #10b981; background: #ecfdf5; }
+    .score-btn.score-5.active .num { color: #10b981; }
+    .nav-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .nav-row .btn { flex: 1; }
+    .btn-back {
+      flex: 0 0 auto !important;
+      padding: 13px 16px;
+      background: var(--gray-100);
+      color: var(--gray-700);
+    }
+
+    /* Summary screen */
+    .summary-hero {
+      background: var(--primary);
+      color: white;
+      border-radius: 16px;
+      padding: 28px 22px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .summary-hero.pass { background: linear-gradient(135deg, #10b981, #059669); }
+    .summary-hero.fail { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .summary-hero.borderline { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .summary-score-big {
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+    .summary-score-of {
+      opacity: 0.85;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+    .summary-verdict {
+      font-size: 16px;
+      font-weight: 700;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 999px;
+      display: inline-block;
+    }
+    .breakdown-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+    .breakdown-title {
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--gray-500);
+      margin-bottom: 14px;
+    }
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--gray-100);
+      gap: 10px;
+    }
+    .breakdown-row:last-child { border-bottom: none; }
+    .breakdown-q {
+      font-size: 13px;
+      color: var(--gray-700);
+      flex: 1;
+      line-height: 1.3;
+    }
+    .breakdown-q small {
+      display: block;
+      color: var(--gray-400);
+      font-size: 10px;
+      margin-bottom: 2px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .breakdown-score {
+      font-size: 18px;
+      font-weight: 800;
+      flex: 0 0 auto;
+      min-width: 32px;
+      text-align: center;
+    }
+    .meta-card {
+      background: var(--gray-100);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 13px;
+      color: var(--gray-700);
+      margin-bottom: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .meta-card .row span:first-child {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--gray-500);
+      margin-bottom: 2px;
+    }
+    .meta-card .row span:last-child {
+      font-weight: 700;
+      color: var(--gray-800);
+    }
+
+    /* Sent screen */
+    .sent-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 40px auto 18px;
+      animation: pop 0.4s ease;
+    }
+    @keyframes pop {
+      0% { transform: scale(0); }
+      60% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+    .sent-title {
+      font-size: 24px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .sent-sub {
+      color: var(--gray-500);
+      text-align: center;
+      font-size: 14px;
+      margin-bottom: 24px;
+      line-height: 1.5;
+      padding: 0 20px;
+    }
+
+    /* Tablet/Desktop */
+    @media (min-width: 768px) {
+      .app-shell { padding: 0 24px; }
+      .topbar { padding: 16px 24px; }
+      .screen { padding: 32px 24px; }
+      .q-title { font-size: 22px; }
+      .q-explain { font-size: 15px; }
+      .score-btn .num { font-size: 28px; }
+      .summary-score-big { font-size: 68px; }
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--gray-900);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- ============== LOGIN ============== -->
+    <div class="screen active" id="screen-login">
+      <div class="login-card">
+        <div class="login-title">Recruitment Scorecard</div>
+        <div class="login-sub">Auto Republic — entrevistas para vendedores</div>
+        <div class="field">
+          <label class="field-label">Usuario<span class="req">*</span></label>
+          <input type="text" id="login-user" class="field-input" autocomplete="username" autocapitalize="off">
+        </div>
+        <div class="field">
+          <label class="field-label">Contraseña<span class="req">*</span></label>
+          <input type="password" id="login-pass" class="field-input" autocomplete="current-password" onkeydown="if(event.key==='Enter') tryLogin()">
+        </div>
+        <button class="btn btn-primary" onclick="tryLogin()" id="login-btn">Iniciar sesión</button>
+        <div class="login-error" id="login-error" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- ============== APP HEADER + INTAKE ============== -->
+    <div class="screen" id="screen-app">
+      <div class="topbar" style="margin:-22px -18px 22px;">
+        <div class="brand">
+          <div class="brand-mark">AR</div>
+          <div class="brand-text">
+            Recruitment Scorecard
+            <small id="header-date">—</small>
+          </div>
+        </div>
+        <div class="user-chip">
+          <span id="header-user">—</span>
+          <button onclick="logout()" title="Cerrar sesión">×</button>
+        </div>
+      </div>
+
+      <div class="intake-card">
+        <div class="intake-title">Nueva entrevista</div>
+        <div class="intake-sub">Datos del candidato. La fecha se carga automática (hoy).</div>
+
+        <div class="field">
+          <label class="field-label">Nombre del candidato<span class="req">*</span></label>
+          <input type="text" id="intake-name" class="field-input" placeholder="Nombre y apellido" autocapitalize="words">
+        </div>
+
+        <div class="field">
+          <label class="field-label">Locación<span class="req">*</span></label>
+          <div class="pill-group" id="intake-location">
+            <button type="button" class="pill-btn" data-loc="Orlando" onclick="setLocation('Orlando')">Orlando</button>
+            <button type="button" class="pill-btn" data-loc="Kissimmee" onclick="setLocation('Kissimmee')">Kissimmee</button>
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label class="field-label">Duración<span class="opt">(min)</span></label>
+            <input type="number" id="intake-duration" class="field-input" placeholder="30" min="1" max="240">
+          </div>
+          <div class="field">
+            <label class="field-label">Fecha</label>
+            <input type="text" id="intake-date" class="field-input" readonly style="background:var(--gray-100); color:var(--gray-500);">
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="startInterview()">Iniciar evaluación →</button>
+      </div>
+    </div>
+
+    <!-- ============== QUESTION ============== -->
+    <div class="screen" id="screen-question">
+      <div class="topbar" style="margin:-22px -18px 22px;">
+        <div class="brand">
+          <div class="brand-mark">AR</div>
+          <div class="brand-text" id="header-candidate-name">—</div>
+        </div>
+        <div class="user-chip">
+          <span id="header-loc">—</span>
+        </div>
+      </div>
+
+      <div class="q-counter" id="q-counter">Pregunta 1 de 10</div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:10%"></div></div>
+
+      <div class="q-card">
+        <div class="q-title" id="q-title">—</div>
+        <div class="q-explain" id="q-explain">—</div>
+        <div class="score-row" id="score-row">
+          <button class="score-btn score-1" data-score="1" onclick="setScore(1)">
+            <span class="num">1</span><span class="lbl">Muy mal</span>
+          </button>
+          <button class="score-btn score-2" data-score="2" onclick="setScore(2)">
+            <span class="num">2</span><span class="lbl">Mal</span>
+          </button>
+          <button class="score-btn score-3" data-score="3" onclick="setScore(3)">
+            <span class="num">3</span><span class="lbl">Reg</span>
+          </button>
+          <button class="score-btn score-4" data-score="4" onclick="setScore(4)">
+            <span class="num">4</span><span class="lbl">Bien</span>
+          </button>
+          <button class="score-btn score-5" data-score="5" onclick="setScore(5)">
+            <span class="num">5</span><span class="lbl">Excel</span>
+          </button>
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-back" onclick="prevQuestion()" id="btn-prev">← Atrás</button>
+          <button class="btn btn-primary" onclick="nextQuestion()" id="btn-next" disabled>Siguiente →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== SUMMARY ============== -->
+    <div class="screen" id="screen-summary">
+      <div class="topbar" style="margin:-22px -18px 22px;">
+        <div class="brand">
+          <div class="brand-mark">AR</div>
+          <div class="brand-text">Resumen<small>Confirma antes de enviar</small></div>
+        </div>
+      </div>
+
+      <div class="summary-hero" id="summary-hero">
+        <div class="summary-score-big" id="summary-score">0</div>
+        <div class="summary-score-of">de 50 puntos</div>
+        <div class="summary-verdict" id="summary-verdict">—</div>
+      </div>
+
+      <div class="meta-card" id="meta-card">
+        <div class="row"><span>Candidato</span><span id="meta-name">—</span></div>
+        <div class="row"><span>Locación</span><span id="meta-loc">—</span></div>
+        <div class="row"><span>Entrevistador</span><span id="meta-interviewer">—</span></div>
+        <div class="row"><span>Duración</span><span id="meta-duration">—</span></div>
+      </div>
+
+      <div class="breakdown-card">
+        <div class="breakdown-title">Detalle por pregunta</div>
+        <div id="breakdown-list"></div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-back" onclick="backToQuestions()">← Editar</button>
+        <button class="btn btn-success" onclick="submitScorecard()" id="submit-btn">Enviar evaluación</button>
+      </div>
+    </div>
+
+    <!-- ============== SENT ============== -->
+    <div class="screen" id="screen-sent">
+      <div class="sent-icon">
+        <svg width="36" height="36" fill="none" stroke="white" stroke-width="3" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <div class="sent-title">Evaluación enviada</div>
+      <div class="sent-sub" id="sent-sub">El scorecard quedó guardado.</div>
+
+      <div style="max-width:380px; margin:0 auto; width:100%; padding:0 18px;">
+        <button class="btn btn-primary" onclick="newInterview()">+ Nueva entrevista</button>
+        <button class="btn btn-secondary" onclick="logout()" style="margin-top:10px;">Cerrar sesión</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ============== Supabase config ==============
+    const SUPA_URL = 'https://xwxjutaqouaeocvxawlw.supabase.co';
+    const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3eGp1dGFxb3VhZW9jdnhhd2x3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTIxMzYsImV4cCI6MjA5MjYyODEzNn0.TOigRbaNL5z3Q7hd4llJyqrC6vZwn_-1R-5JudXtJmU';
+    const SUPA_HEADERS = { apikey: SUPA_ANON, Authorization: `Bearer ${SUPA_ANON}`, 'Content-Type': 'application/json' };
+    const BENCHMARK_PASS = 35;       // ≥35/50 → pasa
+    const BENCHMARK_BORDERLINE = 28;  // 28–34 → borderline (Saúl decide)
+
+    // ============== Questions (8 random + 2 fixed at end) ==============
+    const QUESTIONS_RANDOM = [
+      { id: 1, title: '¿Lo pondrías frente a un cliente hoy?',
+        explain: 'Presencia, imagen, cómo habla. ¿Inspira confianza o genera dudas?' },
+      { id: 2, title: '¿Tiene hambre o está buscando un trabajo?',
+        explain: '¿Quiere ganar dinero o necesita un empleo? No es lo mismo.' },
+      { id: 3, title: '¿Es coachable o cree que ya sabe?',
+        explain: '¿Escucha y acepta corrección, o tiene respuesta para todo?' },
+      { id: 4, title: '¿Aprende solo o necesita que le lleven de la mano?',
+        explain: 'Teléfono, CRM, seguimiento. ¿Se mueve solo o depende de ti para todo?' },
+      { id: 5, title: '¿Tiene algo que perder si no funciona aquí?',
+        explain: 'Familia, responsabilidades, metas. ¿Tiene razones reales para quedarse y producir?' },
+      { id: 6, title: '¿Tiene lo que se necesita para cerrar en 45 días?',
+        explain: 'No perfecto. Que siga el proceso, que cierre, que no sea un dolor de cabeza.' },
+      { id: 7, title: '¿El potencial que ves justifica el riesgo?',
+        explain: 'Honestidad total. Si no funciona nos quemó tiempo y dinero. ¿Vale la pena intentarlo?' },
+      { id: 8, title: '¿Se ve encajando en el equipo y en esta industria?',
+        explain: 'Ventas de carros tiene su propio ritmo y cultura. ¿Esta persona se adapta o va a chocar?' }
+    ];
+    const QUESTIONS_FIXED = [
+      { id: 9, title: '¿Pagarías hasta $1,600 de tu propio bolsillo por esta persona sin garantía de recuperarlo?',
+        explain: 'Porque eso es exactamente lo que está pasando el primer mes. Si no trae clientes propios y cierra solo, ese dinero se fue. ¿Vale esa apuesta?' },
+      { id: 10, title: '¿Te la jugarías por esta persona?',
+        explain: 'La metiste tú. Si falla, es tu responsabilidad. Sabiendo todo lo que acabas de responder — ¿la metes?' }
+    ];
+
+    // ============== State ==============
+    let currentUser = null;
+    let interview = null;       // { candidateName, location, duration, questionOrder: [...], scores: {qid: score} }
+    let currentQuestionIdx = 0;
+    let questionOrder = [];     // array of question objects in display order
+
+    // ============== Boot ==============
+    document.addEventListener('DOMContentLoaded', () => {
+      const u = localStorage.getItem('ar_rs_user');
+      if (u) {
+        currentUser = u;
+        showApp();
+      }
+    });
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
+    // ============== Login ==============
+    async function tryLogin() {
+      const user = document.getElementById('login-user').value.trim();
+      const pass = document.getElementById('login-pass').value;
+      const errEl = document.getElementById('login-error');
+      errEl.style.display = 'none';
+      if (!user || !pass) {
+        errEl.textContent = 'Completa usuario y contraseña';
+        errEl.style.display = 'block';
+        return;
+      }
+      const btn = document.getElementById('login-btn');
+      btn.disabled = true; btn.textContent = 'Verificando…';
+      try {
+        const res = await fetch(`${SUPA_URL}/rest/v1/app_users?name=eq.${encodeURIComponent(user)}&password=eq.${encodeURIComponent(pass)}&select=name`, { headers: SUPA_HEADERS });
+        const data = await res.json();
+        if (!Array.isArray(data) || !data.length) {
+          errEl.textContent = 'Usuario o contraseña incorrectos';
+          errEl.style.display = 'block';
+          btn.disabled = false; btn.textContent = 'Iniciar sesión';
+          return;
+        }
+        currentUser = data[0].name;
+        localStorage.setItem('ar_rs_user', currentUser);
+        showApp();
+      } catch (e) {
+        errEl.textContent = 'Error de red: ' + e.message;
+        errEl.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Iniciar sesión';
+      }
+    }
+
+    function logout() {
+      if (!confirm('¿Cerrar sesión?')) return;
+      localStorage.removeItem('ar_rs_user');
+      currentUser = null;
+      document.getElementById('login-user').value = '';
+      document.getElementById('login-pass').value = '';
+      showScreen('screen-login');
+    }
+
+    function showApp() {
+      document.getElementById('header-user').textContent = currentUser;
+      document.getElementById('header-date').textContent = formatToday();
+      document.getElementById('intake-date').value = formatToday();
+      showScreen('screen-app');
+    }
+
+    function formatToday() {
+      const d = new Date();
+      const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+      return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    }
+    function todayISO() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    // ============== Intake ==============
+    let selectedLocation = null;
+    function setLocation(loc) {
+      selectedLocation = loc;
+      document.querySelectorAll('#intake-location .pill-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.loc === loc);
+      });
+    }
+
+    function startInterview() {
+      const name = document.getElementById('intake-name').value.trim();
+      const duration = parseInt(document.getElementById('intake-duration').value) || null;
+      let valid = true;
+      if (!name) {
+        document.getElementById('intake-name').classList.add('invalid');
+        valid = false;
+      } else { document.getElementById('intake-name').classList.remove('invalid'); }
+      if (!selectedLocation) {
+        document.getElementById('intake-location').style.outline = '2px solid var(--accent)';
+        valid = false;
+      } else { document.getElementById('intake-location').style.outline = ''; }
+      if (!valid) {
+        toast('Completa los campos requeridos');
+        return;
+      }
+      // Build random order for first 8, then fixed 9-10
+      const shuffled = [...QUESTIONS_RANDOM].sort(() => Math.random() - 0.5);
+      questionOrder = [...shuffled, ...QUESTIONS_FIXED];
+
+      interview = {
+        candidateName: name,
+        location: selectedLocation,
+        duration,
+        scores: {},
+        startTime: Date.now()
+      };
+      currentQuestionIdx = 0;
+      document.getElementById('header-candidate-name').innerHTML = name + '<small>' + selectedLocation + '</small>';
+      document.getElementById('header-loc').textContent = selectedLocation;
+      renderQuestion();
+      showScreen('screen-question');
+    }
+
+    // ============== Questions ==============
+    function renderQuestion() {
+      const q = questionOrder[currentQuestionIdx];
+      const total = questionOrder.length;
+      const progress = ((currentQuestionIdx + 1) / total) * 100;
+      document.getElementById('q-counter').textContent = `Pregunta ${currentQuestionIdx + 1} de ${total}`;
+      document.getElementById('progress-fill').style.width = progress + '%';
+      document.getElementById('q-title').textContent = q.title;
+      document.getElementById('q-explain').textContent = q.explain;
+
+      // Mark active score if previously answered
+      const prevScore = interview.scores[q.id];
+      document.querySelectorAll('#score-row .score-btn').forEach(b => {
+        b.classList.toggle('active', parseInt(b.dataset.score) === prevScore);
+      });
+
+      // Next button enabled only if answered
+      document.getElementById('btn-next').disabled = !prevScore;
+      document.getElementById('btn-next').textContent =
+        currentQuestionIdx === total - 1 ? 'Ver resumen →' : 'Siguiente →';
+      document.getElementById('btn-prev').style.visibility = currentQuestionIdx === 0 ? 'hidden' : 'visible';
+    }
+
+    function setScore(score) {
+      const q = questionOrder[currentQuestionIdx];
+      interview.scores[q.id] = score;
+      document.querySelectorAll('#score-row .score-btn').forEach(b => {
+        b.classList.toggle('active', parseInt(b.dataset.score) === score);
+      });
+      document.getElementById('btn-next').disabled = false;
+    }
+
+    function nextQuestion() {
+      const total = questionOrder.length;
+      if (currentQuestionIdx < total - 1) {
+        currentQuestionIdx++;
+        renderQuestion();
+      } else {
+        showSummary();
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIdx > 0) {
+        currentQuestionIdx--;
+        renderQuestion();
+      }
+    }
+
+    function backToQuestions() {
+      currentQuestionIdx = questionOrder.length - 1;
+      renderQuestion();
+      showScreen('screen-question');
+    }
+
+    // ============== Summary ==============
+    function showSummary() {
+      const total = computeTotal();
+      const verdict = getVerdict(total);
+
+      document.getElementById('summary-score').textContent = total;
+      const heroEl = document.getElementById('summary-hero');
+      heroEl.classList.remove('pass', 'fail', 'borderline');
+      heroEl.classList.add(verdict.cssClass);
+      document.getElementById('summary-verdict').textContent = verdict.label;
+
+      document.getElementById('meta-name').textContent = interview.candidateName;
+      document.getElementById('meta-loc').textContent = interview.location;
+      document.getElementById('meta-interviewer').textContent = currentUser;
+      document.getElementById('meta-duration').textContent = interview.duration ? interview.duration + ' min' : '—';
+
+      // Breakdown — show in interview order
+      const allQuestions = [...QUESTIONS_RANDOM, ...QUESTIONS_FIXED];
+      const list = document.getElementById('breakdown-list');
+      list.innerHTML = allQuestions.map(q => {
+        const score = interview.scores[q.id] || 0;
+        const color = score >= 4 ? 'var(--green)' : score === 3 ? 'var(--yellow)' : 'var(--red)';
+        return `
+          <div class="breakdown-row">
+            <div class="breakdown-q">
+              <small>Q${q.id}</small>
+              ${escapeHtml(q.title)}
+            </div>
+            <div class="breakdown-score" style="color:${color};">${score}/5</div>
+          </div>
+        `;
+      }).join('');
+
+      showScreen('screen-summary');
+    }
+
+    function computeTotal() {
+      return Object.values(interview.scores).reduce((s, v) => s + (v || 0), 0);
+    }
+
+    function getVerdict(total) {
+      if (total >= BENCHMARK_PASS) return { cssClass: 'pass', label: '✓ Aprobado · Agendar con Saúl', passed: true };
+      if (total >= BENCHMARK_BORDERLINE) return { cssClass: 'borderline', label: '⚠ Borderline · Saúl decide', passed: null };
+      return { cssClass: 'fail', label: '✗ No pasa', passed: false };
+    }
+
+    // ============== Submit ==============
+    async function submitScorecard() {
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true; btn.textContent = 'Enviando…';
+
+      const total = computeTotal();
+      const verdict = getVerdict(total);
+      const scoresArray = [...QUESTIONS_RANDOM, ...QUESTIONS_FIXED].map(q => ({
+        question_id: q.id,
+        question: q.title,
+        score: interview.scores[q.id] || 0
+      }));
+
+      const payload = {
+        candidate_name: interview.candidateName,
+        interview_date: todayISO(),
+        location: interview.location,
+        interviewer: currentUser,
+        duration_minutes: interview.duration,
+        scores: scoresArray,
+        total_score: total,
+        benchmark_passed: verdict.passed === true,
+        submitted_by: currentUser
+      };
+
+      try {
+        const res = await fetch(`${SUPA_URL}/rest/v1/ar_interview_scorecards`, {
+          method: 'POST',
+          headers: { ...SUPA_HEADERS, Prefer: 'return=representation' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error(await res.text());
+        document.getElementById('sent-sub').innerHTML = verdict.passed
+          ? `Score <b>${total}/50</b> — pasó el benchmark. Saúl recibirá la notificación para agendar reunión con <b>${escapeHtml(interview.candidateName)}</b>.`
+          : verdict.passed === null
+            ? `Score <b>${total}/50</b> — borderline. Saúl revisará el caso.`
+            : `Score <b>${total}/50</b> — no pasa. Quedó guardado para registro.`;
+        showScreen('screen-sent');
+      } catch (e) {
+        toast('Error al enviar: ' + e.message);
+        btn.disabled = false; btn.textContent = 'Enviar evaluación';
+      }
+    }
+
+    function newInterview() {
+      interview = null;
+      currentQuestionIdx = 0;
+      selectedLocation = null;
+      document.getElementById('intake-name').value = '';
+      document.getElementById('intake-duration').value = '';
+      document.querySelectorAll('#intake-location .pill-btn').forEach(b => b.classList.remove('active'));
+      showApp();
+    }
+
+    // ============== Utils ==============
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._toastT);
+      window._toastT = setTimeout(() => t.classList.remove('show'), 2400);
+    }
+  </script>
+</body>
+</html>
