@@ -267,9 +267,12 @@
     .q-card {
       background: white;
       border-radius: 16px;
-      padding: 24px 22px 22px;
+      padding: 22px 16px 18px;
       box-shadow: var(--shadow);
       margin-bottom: 16px;
+    }
+    @media (min-width: 480px) {
+      .q-card { padding: 24px 22px 22px; }
     }
     .q-title {
       font-size: 19px;
@@ -287,12 +290,12 @@
     .score-row {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
+      gap: 6px;
     }
     .score-btn {
-      padding: 18px 6px 12px;
+      padding: 14px 2px 10px;
       border: 1.5px solid var(--gray-200);
-      border-radius: 12px;
+      border-radius: 10px;
       background: white;
       cursor: pointer;
       font-family: inherit;
@@ -301,20 +304,30 @@
       flex-direction: column;
       align-items: center;
       gap: 4px;
+      min-width: 0;
+    }
+    @media (min-width: 480px) {
+      .score-row { gap: 8px; }
+      .score-btn { padding: 18px 6px 12px; border-radius: 12px; }
     }
     .score-btn:active { transform: scale(0.96); }
     .score-btn .num {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 800;
       color: var(--gray-700);
       line-height: 1;
     }
     .score-btn .lbl {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
       color: var(--gray-500);
       text-transform: uppercase;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+    @media (min-width: 480px) {
+      .score-btn .num { font-size: 24px; }
+      .score-btn .lbl { font-size: 10px; letter-spacing: 0.3px; }
     }
     .score-btn.active {
       border-color: var(--primary);
@@ -336,13 +349,15 @@
       gap: 10px;
       margin-top: 18px;
     }
-    .nav-row .btn { flex: 1; }
+    .nav-row .btn { flex: 1; min-width: 0; }
     .btn-back {
       flex: 0 0 auto !important;
-      padding: 13px 16px;
+      padding: 13px 14px;
       background: var(--gray-100);
       color: var(--gray-700);
+      font-size: 14px;
     }
+    .btn-back.is-hidden { display: none !important; }
 
     /* Summary screen */
     .summary-hero {
@@ -567,12 +582,9 @@
     <!-- ============== QUESTION ============== -->
     <div class="screen" id="screen-question">
       <div class="topbar" style="margin:-22px -18px 22px;">
-        <div class="brand">
+        <div class="brand" style="min-width:0; flex:1;">
           <div class="brand-mark">AR</div>
-          <div class="brand-text" id="header-candidate-name">—</div>
-        </div>
-        <div class="user-chip">
-          <span id="header-loc">—</span>
+          <div class="brand-text" id="header-candidate-name" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">—</div>
         </div>
       </div>
 
@@ -584,7 +596,7 @@
         <div class="q-explain" id="q-explain">—</div>
         <div class="score-row" id="score-row">
           <button class="score-btn score-1" data-score="1" onclick="setScore(1)">
-            <span class="num">1</span><span class="lbl">Muy mal</span>
+            <span class="num">1</span><span class="lbl">No</span>
           </button>
           <button class="score-btn score-2" data-score="2" onclick="setScore(2)">
             <span class="num">2</span><span class="lbl">Mal</span>
@@ -596,7 +608,7 @@
             <span class="num">4</span><span class="lbl">Bien</span>
           </button>
           <button class="score-btn score-5" data-score="5" onclick="setScore(5)">
-            <span class="num">5</span><span class="lbl">Excel</span>
+            <span class="num">5</span><span class="lbl">Sí</span>
           </button>
         </div>
         <div class="nav-row">
@@ -813,7 +825,7 @@
       document.getElementById('btn-next').disabled = !prevScore;
       document.getElementById('btn-next').textContent =
         currentQuestionIdx === total - 1 ? 'Ver resumen →' : 'Siguiente →';
-      document.getElementById('btn-prev').style.visibility = currentQuestionIdx === 0 ? 'hidden' : 'visible';
+      document.getElementById('btn-prev').classList.toggle('is-hidden', currentQuestionIdx === 0);
     }
 
     function setScore(score) {
