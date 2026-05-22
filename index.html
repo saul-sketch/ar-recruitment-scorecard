@@ -589,7 +589,7 @@
         </div>
 
         <button class="btn btn-primary" onclick="safeStartInterview()">Iniciar evaluación →</button>
-        <div style="text-align:center; font-size:10px; color:var(--gray-400); margin-top:12px;">v5 · 2026-05-22</div>
+        <div style="text-align:center; font-size:10px; color:var(--gray-400); margin-top:12px;">v6 · 2026-05-22</div>
       </div>
     </div>
 
@@ -658,6 +658,14 @@
       <div class="breakdown-card">
         <div class="breakdown-title">Detalle por pregunta</div>
         <div id="breakdown-list"></div>
+      </div>
+
+      <div class="breakdown-card">
+        <div class="breakdown-title">Notas del entrevistador <span style="color:var(--accent); font-weight:700;">*</span></div>
+        <p style="font-size:12px; color:var(--gray-500); margin:-6px 0 12px;">Observaciones libres, gut feeling, contexto que no entró en las preguntas. Mandatorio.</p>
+        <textarea id="interview-notes" rows="5"
+          placeholder="Ej: muy buena presencia, vino preparado, ya tenía investigada la empresa. Bilingüe nativo. Su único riesgo es que vive lejos del lot y depende de transporte público — confirmar logística antes de contratar."
+          style="width:100%; padding:12px 14px; border:1.5px solid var(--gray-300); border-radius:10px; font-size:14px; font-family:inherit; resize:vertical; min-height:100px; line-height:1.5;"></textarea>
       </div>
 
       <div class="nav-row">
@@ -964,6 +972,18 @@
 
     // ============== Submit ==============
     async function submitScorecard() {
+      const notesEl = document.getElementById('interview-notes');
+      const notes = (notesEl?.value || '').trim();
+      if (!notes) {
+        notesEl.style.borderColor = 'var(--accent)';
+        notesEl.style.boxShadow = '0 0 0 3px rgba(233,69,96,0.1)';
+        notesEl.focus();
+        toast('Escribe las notas del entrevistador (mandatorio)');
+        return;
+      }
+      notesEl.style.borderColor = '';
+      notesEl.style.boxShadow = '';
+
       const btn = document.getElementById('submit-btn');
       btn.disabled = true; btn.textContent = 'Enviando…';
 
@@ -985,6 +1005,7 @@
         scores: scoresArray,
         total_score: total,
         benchmark_passed: verdict.passed === true,
+        notes,
         submitted_by: currentUser
       };
 
@@ -1062,7 +1083,8 @@
             { name: 'Locación', value: payload.location, inline: true },
             { name: 'Entrevistador', value: payload.interviewer, inline: true },
             { name: 'Duración', value: payload.duration_minutes ? `${payload.duration_minutes} min` : '—', inline: true },
-            { name: 'Detalle', value: breakdown, inline: false }
+            { name: 'Detalle', value: breakdown, inline: false },
+            { name: 'Notas', value: (payload.notes || '—').slice(0, 1000), inline: false }
           ],
           footer: { text: `AR Recruitment Scorecard · ${dateNice}` },
           timestamp: new Date().toISOString()
@@ -1083,6 +1105,8 @@
       document.getElementById('intake-name').value = '';
       document.getElementById('intake-age').value = '';
       document.getElementById('intake-duration').value = '';
+      const n = document.getElementById('interview-notes');
+      if (n) { n.value = ''; n.style.borderColor = ''; n.style.boxShadow = ''; }
       document.querySelectorAll('#intake-location .pill-btn').forEach(b => b.classList.remove('active'));
       // Keep interviewer dropdown with last selection (already loaded)
       showScreen('screen-app');
