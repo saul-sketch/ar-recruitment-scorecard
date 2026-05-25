@@ -714,6 +714,7 @@
     const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1507469284299903036/0XkuWm9jSZSRjCZkYv4xn5mqS_E-Gk2Eeu_fOc9HxUMLCpLxIsipzzHzEt9lepUULBW8';
     const DISCORD_USER_HEADHUNTER = '1467993058158186678';
     const DISCORD_USER_SAUL = '1242195465760542723';
+    const DISCORD_USER_CHARLES = '1468206071133900915';
 
     // ============== Questions (8 random + 2 fixed at end) ==============
     const QUESTIONS_RANDOM = [
@@ -1071,14 +1072,14 @@
       const dateNice = new Date().toLocaleDateString('es-ES', { day:'numeric', month:'long', year:'numeric' });
 
       // Mention strategy:
-      //  PASS       → headhunter + Saúl (coordinar agendar)
-      //  BORDERLINE → headhunter + Saúl (Saúl decide)
-      //  FAIL       → solo headhunter (no molestar a Saúl)
+      //  PASS       → headhunter + Saúl + Charles (coordinar agendar)
+      //  BORDERLINE → headhunter + Saúl + Charles (Saúl/Charles deciden)
+      //  FAIL       → solo headhunter (no molestar a Saúl/Charles)
       let mentionIds = [];
       let mentionText = '';
       if (verdict.cssClass === 'pass' || verdict.cssClass === 'borderline') {
-        mentionIds = [DISCORD_USER_HEADHUNTER, DISCORD_USER_SAUL];
-        mentionText = `<@${DISCORD_USER_HEADHUNTER}> <@${DISCORD_USER_SAUL}>`;
+        mentionIds = [DISCORD_USER_HEADHUNTER, DISCORD_USER_SAUL, DISCORD_USER_CHARLES];
+        mentionText = `<@${DISCORD_USER_HEADHUNTER}> <@${DISCORD_USER_SAUL}> <@${DISCORD_USER_CHARLES}>`;
       } else {
         mentionIds = [DISCORD_USER_HEADHUNTER];
         mentionText = `<@${DISCORD_USER_HEADHUNTER}>`;
