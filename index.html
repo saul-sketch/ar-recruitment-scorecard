@@ -542,19 +542,19 @@
           <div class="brand-mark">AR</div>
           <div class="brand-text">
             Recruitment Scorecard
-            <small id="header-date">‚Äî</small>
+            <small id="header-date">—</small>
           </div>
         </div>
       </div>
 
       <div class="intake-card">
         <div class="intake-title">Nueva entrevista</div>
-        <div class="intake-sub">Datos del candidato. La fecha se carga autom√°tica (hoy).</div>
+        <div class="intake-sub">Datos del candidato. La fecha se carga automática (hoy).</div>
 
         <div class="field">
           <label class="field-label">Entrevistador<span class="req">*</span></label>
           <select id="intake-interviewer" class="field-select" onchange="onInterviewerChange()">
-            <option value="">Cargando‚Ä¶</option>
+            <option value="">Cargando…</option>
           </select>
         </div>
 
@@ -570,12 +570,12 @@
         </div>
 
         <div class="field">
-          <label class="field-label">Tel√©fono del candidato<span class="req">*</span></label>
+          <label class="field-label">Teléfono del candidato<span class="req">*</span></label>
           <input type="tel" id="intake-phone" class="field-input" placeholder="(407) 555-1234" inputmode="tel" autocomplete="tel">
         </div>
 
         <div class="field">
-          <label class="field-label">Locaci√≥n<span class="req">*</span></label>
+          <label class="field-label">Locación<span class="req">*</span></label>
           <div class="pill-group" id="intake-location">
             <button type="button" class="pill-btn" data-loc="Orlando" onclick="setLocation('Orlando')">Orlando</button>
             <button type="button" class="pill-btn" data-loc="Kissimmee" onclick="setLocation('Kissimmee')">Kissimmee</button>
@@ -584,7 +584,7 @@
 
         <div class="row-2">
           <div class="field">
-            <label class="field-label">Duraci√≥n<span class="opt">(min)</span></label>
+            <label class="field-label">Duración<span class="opt">(min)</span></label>
             <input type="number" id="intake-duration" class="field-input" placeholder="30" min="1" max="240">
           </div>
           <div class="field">
@@ -593,8 +593,8 @@
           </div>
         </div>
 
-        <button class="btn btn-primary" onclick="safeStartInterview()">Iniciar evaluaci√≥n ‚Üí</button>
-        <div style="text-align:center; font-size:10px; color:var(--gray-400); margin-top:12px;">v8 ¬∑ 2026-06-06</div>
+        <button class="btn btn-primary" onclick="safeStartInterview()">Iniciar evaluación →</button>
+        <div style="text-align:center; font-size:10px; color:var(--gray-400); margin-top:12px;">v8 · 2026-06-06</div>
       </div>
     </div>
 
@@ -603,7 +603,7 @@
       <div class="topbar" style="margin:-22px -18px 22px;">
         <div class="brand" style="min-width:0; flex:1;">
           <div class="brand-mark">AR</div>
-          <div class="brand-text" id="header-candidate-name" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">‚Äî</div>
+          <div class="brand-text" id="header-candidate-name" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">—</div>
         </div>
       </div>
 
@@ -611,8 +611,8 @@
       <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:10%"></div></div>
 
       <div class="q-card">
-        <div class="q-title" id="q-title">‚Äî</div>
-        <div class="q-explain" id="q-explain">‚Äî</div>
+        <div class="q-title" id="q-title">—</div>
+        <div class="q-explain" id="q-explain">—</div>
         <div class="score-row" id="score-row">
           <button class="score-btn score-1" data-score="1" onclick="setScore(1)">
             <span class="num">1</span><span class="lbl">No</span>
@@ -627,12 +627,12 @@
             <span class="num">4</span><span class="lbl">Bien</span>
           </button>
           <button class="score-btn score-5" data-score="5" onclick="setScore(5)">
-            <span class="num">5</span><span class="lbl">S√≠</span>
+            <span class="num">5</span><span class="lbl">Sí</span>
           </button>
         </div>
         <div class="nav-row">
-          <button class="btn btn-back" onclick="prevQuestion()" id="btn-prev">‚Üê Atr√°s</button>
-          <button class="btn btn-primary" onclick="nextQuestion()" id="btn-next" disabled>Siguiente ‚Üí</button>
+          <button class="btn btn-back" onclick="prevQuestion()" id="btn-prev">← Atrás</button>
+          <button class="btn btn-primary" onclick="nextQuestion()" id="btn-next" disabled>Siguiente →</button>
         </div>
       </div>
     </div>
@@ -649,16 +649,16 @@
       <div class="summary-hero" id="summary-hero">
         <div class="summary-score-big" id="summary-score">0</div>
         <div class="summary-score-of">de 50 puntos</div>
-        <div class="summary-verdict" id="summary-verdict">‚Äî</div>
+        <div class="summary-verdict" id="summary-verdict">—</div>
       </div>
 
       <div class="meta-card" id="meta-card">
-        <div class="row"><span>Candidato</span><span id="meta-name">‚Äî</span></div>
-        <div class="row"><span>Tel√©fono</span><span id="meta-phone">‚Äî</span></div>
-        <div class="row"><span>Edad</span><span id="meta-age">‚Äî</span></div>
-        <div class="row"><span>Locaci√≥n</span><span id="meta-loc">‚Äî</span></div>
-        <div class="row"><span>Entrevistador</span><span id="meta-interviewer">‚Äî</span></div>
-        <div class="row"><span>Duraci√≥n</span><span id="meta-duration">‚Äî</span></div>
+        <div class="row"><span>Candidato</span><span id="meta-name">—</span></div>
+        <div class="row"><span>Teléfono</span><span id="meta-phone">—</span></div>
+        <div class="row"><span>Edad</span><span id="meta-age">—</span></div>
+        <div class="row"><span>Locación</span><span id="meta-loc">—</span></div>
+        <div class="row"><span>Entrevistador</span><span id="meta-interviewer">—</span></div>
+        <div class="row"><span>Duración</span><span id="meta-duration">—</span></div>
       </div>
 
       <div class="breakdown-card">
@@ -668,15 +668,15 @@
 
       <div class="breakdown-card">
         <div class="breakdown-title">Notas del entrevistador <span style="color:var(--accent); font-weight:700;">*</span></div>
-        <p style="font-size:12px; color:var(--gray-500); margin:-6px 0 12px;">Observaciones libres, gut feeling, contexto que no entr√≥ en las preguntas. Mandatorio.</p>
+        <p style="font-size:12px; color:var(--gray-500); margin:-6px 0 12px;">Observaciones libres, gut feeling, contexto que no entró en las preguntas. Mandatorio.</p>
         <textarea id="interview-notes" rows="5"
-          placeholder="Ej: muy buena presencia, vino preparado, ya ten√≠a investigada la empresa. Biling√ºe nativo. Su √∫nico riesgo es que vive lejos del lot y depende de transporte p√∫blico ‚Äî confirmar log√≠stica antes de contratar."
+          placeholder="Ej: muy buena presencia, vino preparado, ya tenía investigada la empresa. Bilingüe nativo. Su único riesgo es que vive lejos del lot y depende de transporte público — confirmar logística antes de contratar."
           style="width:100%; padding:12px 14px; border:1.5px solid var(--gray-300); border-radius:10px; font-size:14px; font-family:inherit; resize:vertical; min-height:100px; line-height:1.5;"></textarea>
       </div>
 
       <div class="nav-row">
-        <button class="btn btn-back" onclick="backToQuestions()">‚Üê Editar</button>
-        <button class="btn btn-success" onclick="submitScorecard()" id="submit-btn">Enviar evaluaci√≥n</button>
+        <button class="btn btn-back" onclick="backToQuestions()">← Editar</button>
+        <button class="btn btn-success" onclick="submitScorecard()" id="submit-btn">Enviar evaluación</button>
       </div>
     </div>
 
@@ -687,8 +687,8 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
         </svg>
       </div>
-      <div class="sent-title">Evaluaci√≥n enviada</div>
-      <div class="sent-sub" id="sent-sub">El scorecard qued√≥ guardado.</div>
+      <div class="sent-title">Evaluación enviada</div>
+      <div class="sent-sub" id="sent-sub">El scorecard quedó guardado.</div>
 
       <div style="max-width:380px; margin:0 auto; width:100%; padding:0 18px;">
         <button class="btn btn-primary" onclick="newInterview()">+ Nueva entrevista</button>
@@ -715,8 +715,8 @@
     const SUPA_URL = 'https://xwxjutaqouaeocvxawlw.supabase.co';
     const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3eGp1dGFxb3VhZW9jdnhhd2x3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTIxMzYsImV4cCI6MjA5MjYyODEzNn0.TOigRbaNL5z3Q7hd4llJyqrC6vZwn_-1R-5JudXtJmU';
     const SUPA_HEADERS = { apikey: SUPA_ANON, Authorization: `Bearer ${SUPA_ANON}`, 'Content-Type': 'application/json' };
-    const BENCHMARK_PASS = 35;       // ‚â•35/50 ‚Üí pasa
-    const BENCHMARK_BORDERLINE = 28;  // 28‚Äì34 ‚Üí borderline (Sa√∫l decide)
+    const BENCHMARK_PASS = 35;       // ≥35/50 → pasa
+    const BENCHMARK_BORDERLINE = 28;  // 28–34 → borderline (Saúl decide)
     const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1507469284299903036/0XkuWm9jSZSRjCZkYv4xn5mqS_E-Gk2Eeu_fOc9HxUMLCpLxIsipzzHzEt9lepUULBW8';
     const DISCORD_USER_HEADHUNTER = '1467993058158186678';
     const DISCORD_USER_SAUL = '1242195465760542723';
@@ -724,28 +724,28 @@
 
     // ============== Questions (8 random + 2 fixed at end) ==============
     const QUESTIONS_RANDOM = [
-      { id: 1, title: '¬øLo pondr√≠as frente a un cliente hoy?',
-        explain: 'Presencia, imagen, c√≥mo habla. ¬øInspira confianza o genera dudas?' },
-      { id: 2, title: '¬øTiene hambre o est√° buscando un trabajo?',
-        explain: '¬øQuiere ganar dinero o necesita un empleo? No es lo mismo.' },
-      { id: 3, title: '¬øEs coachable o cree que ya sabe?',
-        explain: '¬øEscucha y acepta correcci√≥n, o tiene respuesta para todo?' },
-      { id: 4, title: '¬øAprende solo o necesita que le lleven de la mano?',
-        explain: 'Tel√©fono, CRM, seguimiento. ¬øSe mueve solo o depende de ti para todo?' },
-      { id: 5, title: '¬øTiene algo que perder si no funciona aqu√≠?',
-        explain: 'Familia, responsabilidades, metas. ¬øTiene razones reales para quedarse y producir?' },
-      { id: 6, title: '¬øTiene lo que se necesita para cerrar en 45 d√≠as?',
+      { id: 1, title: '¿Lo pondrías frente a un cliente hoy?',
+        explain: 'Presencia, imagen, cómo habla. ¿Inspira confianza o genera dudas?' },
+      { id: 2, title: '¿Tiene hambre o está buscando un trabajo?',
+        explain: '¿Quiere ganar dinero o necesita un empleo? No es lo mismo.' },
+      { id: 3, title: '¿Es coachable o cree que ya sabe?',
+        explain: '¿Escucha y acepta corrección, o tiene respuesta para todo?' },
+      { id: 4, title: '¿Aprende solo o necesita que le lleven de la mano?',
+        explain: 'Teléfono, CRM, seguimiento. ¿Se mueve solo o depende de ti para todo?' },
+      { id: 5, title: '¿Tiene algo que perder si no funciona aquí?',
+        explain: 'Familia, responsabilidades, metas. ¿Tiene razones reales para quedarse y producir?' },
+      { id: 6, title: '¿Tiene lo que se necesita para cerrar en 45 días?',
         explain: 'No perfecto. Que siga el proceso, que cierre, que no sea un dolor de cabeza.' },
-      { id: 7, title: '¬øEl potencial que ves justifica el riesgo?',
-        explain: 'Honestidad total. Si no funciona nos quem√≥ tiempo y dinero. ¬øVale la pena intentarlo?' },
-      { id: 8, title: '¬øSe ve encajando en el equipo y en esta industria?',
-        explain: 'Ventas de carros tiene su propio ritmo y cultura. ¬øEsta persona se adapta o va a chocar?' }
+      { id: 7, title: '¿El potencial que ves justifica el riesgo?',
+        explain: 'Honestidad total. Si no funciona nos quemó tiempo y dinero. ¿Vale la pena intentarlo?' },
+      { id: 8, title: '¿Se ve encajando en el equipo y en esta industria?',
+        explain: 'Ventas de carros tiene su propio ritmo y cultura. ¿Esta persona se adapta o va a chocar?' }
     ];
     const QUESTIONS_FIXED = [
-      { id: 9, title: '¬øPagar√≠as hasta $1,600 de tu propio bolsillo por esta persona sin garant√≠a de recuperarlo?',
-        explain: 'Porque eso es exactamente lo que est√° pasando el primer mes. Si no trae clientes propios y cierra solo, ese dinero se fue. ¬øVale esa apuesta?' },
-      { id: 10, title: '¬øTe la jugar√≠as por esta persona?',
-        explain: 'La metiste t√∫. Si falla, es tu responsabilidad. Sabiendo todo lo que acabas de responder ‚Äî ¬øla metes?' }
+      { id: 9, title: '¿Pagarías hasta $1,600 de tu propio bolsillo por esta persona sin garantía de recuperarlo?',
+        explain: 'Porque eso es exactamente lo que está pasando el primer mes. Si no trae clientes propios y cierra solo, ese dinero se fue. ¿Vale esa apuesta?' },
+      { id: 10, title: '¿Te la jugarías por esta persona?',
+        explain: 'La metiste tú. Si falla, es tu responsabilidad. Sabiendo todo lo que acabas de responder — ¿la metes?' }
     ];
 
     // ============== State ==============
@@ -772,7 +772,7 @@
       }
       const sel = document.getElementById('intake-interviewer');
       const last = localStorage.getItem('ar_rs_interviewer') || '';
-      sel.innerHTML = '<option value="">Seleccionar‚Ä¶</option>' +
+      sel.innerHTML = '<option value="">Seleccionar…</option>' +
         managersList.map(n => `<option value="${escapeAttr(n)}" ${n === last ? 'selected' : ''}>${escapeHtml(n)}</option>`).join('');
       if (last && managersList.includes(last)) currentUser = last;
     }
@@ -813,7 +813,7 @@
         startInterview();
       } catch (e) {
         console.error('startInterview error:', e);
-        alert('Error al iniciar: ' + (e && e.message ? e.message : e) + '\n\nManda screenshot de este mensaje a Sa√∫l.');
+        alert('Error al iniciar: ' + (e && e.message ? e.message : e) + '\n\nManda screenshot de este mensaje a Saúl.');
       }
     }
 
@@ -866,7 +866,7 @@
         startTime: Date.now()
       };
       currentQuestionIdx = 0;
-      document.getElementById('header-candidate-name').innerHTML = name + '<small>' + age + ' a√±os ¬∑ ' + selectedLocation + '</small>';
+      document.getElementById('header-candidate-name').innerHTML = name + '<small>' + age + ' años · ' + selectedLocation + '</small>';
       renderQuestion();
       showScreen('screen-question');
     }
@@ -890,7 +890,7 @@
       // Next button enabled only if answered
       document.getElementById('btn-next').disabled = !prevScore;
       document.getElementById('btn-next').textContent =
-        currentQuestionIdx === total - 1 ? 'Ver resumen ‚Üí' : 'Siguiente ‚Üí';
+        currentQuestionIdx === total - 1 ? 'Ver resumen →' : 'Siguiente →';
       document.getElementById('btn-prev').classList.toggle('is-hidden', currentQuestionIdx === 0);
     }
 
@@ -908,7 +908,7 @@
     }
 
     function nextQuestion() {
-      // Defensive ‚Äî even if disabled attr fails, validate before advancing
+      // Defensive — even if disabled attr fails, validate before advancing
       const q = questionOrder[currentQuestionIdx];
       if (!interview.scores[q.id]) {
         toast('Selecciona un score (1-5)');
@@ -949,13 +949,13 @@
       document.getElementById('summary-verdict').textContent = verdict.label;
 
       document.getElementById('meta-name').textContent = interview.candidateName;
-      document.getElementById('meta-phone').textContent = interview.phone || '‚Äî';
-      document.getElementById('meta-age').textContent = interview.age ? interview.age + ' a√±os' : '‚Äî';
+      document.getElementById('meta-phone').textContent = interview.phone || '—';
+      document.getElementById('meta-age').textContent = interview.age ? interview.age + ' años' : '—';
       document.getElementById('meta-loc').textContent = interview.location;
       document.getElementById('meta-interviewer').textContent = currentUser;
-      document.getElementById('meta-duration').textContent = interview.duration ? interview.duration + ' min' : '‚Äî';
+      document.getElementById('meta-duration').textContent = interview.duration ? interview.duration + ' min' : '—';
 
-      // Breakdown ‚Äî show in interview order
+      // Breakdown — show in interview order
       const allQuestions = [...QUESTIONS_RANDOM, ...QUESTIONS_FIXED];
       const list = document.getElementById('breakdown-list');
       list.innerHTML = allQuestions.map(q => {
@@ -980,9 +980,9 @@
     }
 
     function getVerdict(total) {
-      if (total >= BENCHMARK_PASS) return { cssClass: 'pass', label: '‚úì Aprobado ¬∑ Agendar con Sa√∫l', passed: true };
-      if (total >= BENCHMARK_BORDERLINE) return { cssClass: 'borderline', label: '‚ö† Borderline ¬∑ Sa√∫l decide', passed: null };
-      return { cssClass: 'fail', label: '‚úó No pasa', passed: false };
+      if (total >= BENCHMARK_PASS) return { cssClass: 'pass', label: '✓ Aprobado · Agendar con Saúl', passed: true };
+      if (total >= BENCHMARK_BORDERLINE) return { cssClass: 'borderline', label: '⚠ Borderline · Saúl decide', passed: null };
+      return { cssClass: 'fail', label: '✗ No pasa', passed: false };
     }
 
     // ============== Submit ==============
@@ -1000,7 +1000,7 @@
       notesEl.style.boxShadow = '';
 
       const btn = document.getElementById('submit-btn');
-      btn.disabled = true; btn.textContent = 'Enviando‚Ä¶';
+      btn.disabled = true; btn.textContent = 'Enviando…';
 
       const total = computeTotal();
       const verdict = getVerdict(total);
@@ -1011,8 +1011,8 @@
       }));
 
       // Phone is stored as a marked first line of notes (no schema change needed);
-      // the dashboard parses this "‚òé ‚Ä¶" line into a clickable tel link.
-      const notesWithPhone = (interview.phone ? `‚òé ${interview.phone}\n‚Äî‚Äî‚Äî\n` : '') + notes;
+      // the dashboard parses this "☎ …" line into a clickable tel link.
+      const notesWithPhone = (interview.phone ? `☎ ${interview.phone}\n———\n` : '') + notes;
 
       const payload = {
         candidate_name: interview.candidateName,
@@ -1028,7 +1028,7 @@
         submitted_by: currentUser
       };
 
-      // 15s timeout safety net so the button never stays in "Enviando‚Ä¶" forever
+      // 15s timeout safety net so the button never stays in "Enviando…" forever
       const ctrl = new AbortController();
       const tid = setTimeout(() => ctrl.abort(), 15000);
 
@@ -1046,21 +1046,21 @@
         postToDiscord(payload, verdict, interview.phone).catch(err => console.warn('Discord notify failed:', err));
 
         document.getElementById('sent-sub').innerHTML = verdict.passed
-          ? `Score <b>${total}/50</b> ‚Äî pas√≥ el benchmark. Sa√∫l recibir√° la notificaci√≥n para agendar reuni√≥n con <b>${escapeHtml(interview.candidateName)}</b>.`
+          ? `Score <b>${total}/50</b> — pasó el benchmark. Saúl recibirá la notificación para agendar reunión con <b>${escapeHtml(interview.candidateName)}</b>.`
           : verdict.passed === null
-            ? `Score <b>${total}/50</b> ‚Äî borderline. Sa√∫l revisar√° el caso.`
-            : `Score <b>${total}/50</b> ‚Äî no pasa. Qued√≥ guardado para registro.`;
+            ? `Score <b>${total}/50</b> — borderline. Saúl revisará el caso.`
+            : `Score <b>${total}/50</b> — no pasa. Quedó guardado para registro.`;
         showScreen('screen-sent');
       } catch (e) {
         const msg = e.name === 'AbortError'
-          ? 'Tard√≥ demasiado ‚Äî revisa internet e intenta de nuevo (la data no se perdi√≥)'
+          ? 'Tardó demasiado — revisa internet e intenta de nuevo (la data no se perdió)'
           : 'Error al enviar: ' + (e.message || e);
         toast(msg);
       } finally {
         clearTimeout(tid);
-        // ALWAYS reset button ‚Äî never leave it stuck on "Enviando‚Ä¶"
+        // ALWAYS reset button — never leave it stuck on "Enviando…"
         btn.disabled = false;
-        btn.textContent = 'Enviar evaluaci√≥n';
+        btn.textContent = 'Enviar evaluación';
       }
     }
 
@@ -1072,11 +1072,11 @@
         fail: 15679044        // red
       };
       const emojiMap = {
-        pass: '‚úÖ', borderline: '‚ö†Ô∏è', fail: '‚ùå'
+        pass: '✅', borderline: '⚠️', fail: '❌'
       };
       const verdictLabel = {
-        pass: 'Aprobado ‚Äî Agendar con Sa√∫l',
-        borderline: 'Borderline ‚Äî Sa√∫l decide',
+        pass: 'Aprobado — Agendar con Saúl',
+        borderline: 'Borderline — Saúl decide',
         fail: 'No pasa'
       };
 
@@ -1084,15 +1084,15 @@
       const scoreMap = {};
       (payload.scores || []).forEach(s => { scoreMap[s.question_id] = s.score; });
       const breakdown = [1,2,3,4,5,6,7,8,9,10]
-        .map(qid => `Q${qid}=${scoreMap[qid] ?? '‚Äì'}`)
-        .join(' ¬∑ ');
+        .map(qid => `Q${qid}=${scoreMap[qid] ?? '–'}`)
+        .join(' · ');
 
       const dateNice = new Date().toLocaleDateString('es-ES', { day:'numeric', month:'long', year:'numeric' });
 
       // Mention strategy:
-      //  PASS       ‚Üí headhunter + Sa√∫l + Charles (coordinar agendar)
-      //  BORDERLINE ‚Üí headhunter + Sa√∫l + Charles (Sa√∫l/Charles deciden)
-      //  FAIL       ‚Üí solo headhunter (no molestar a Sa√∫l/Charles)
+      //  PASS       → headhunter + Saúl + Charles (coordinar agendar)
+      //  BORDERLINE → headhunter + Saúl + Charles (Saúl/Charles deciden)
+      //  FAIL       → solo headhunter (no molestar a Saúl/Charles)
       let mentionIds = [];
       let mentionText = '';
       if (verdict.cssClass === 'pass' || verdict.cssClass === 'borderline') {
@@ -1107,19 +1107,19 @@
         content: mentionText,
         allowed_mentions: { users: mentionIds },
         embeds: [{
-          title: `${emojiMap[verdict.cssClass]} Nueva entrevista ‚Äî ${payload.candidate_name}`,
+          title: `${emojiMap[verdict.cssClass]} Nueva entrevista — ${payload.candidate_name}`,
           color: colorMap[verdict.cssClass] || 1102505,
           fields: [
-            { name: 'Score', value: `**${payload.total_score}/50** ¬∑ ${verdictLabel[verdict.cssClass]}`, inline: false },
-            { name: 'üìû Tel√©fono', value: candidatePhone || '‚Äî', inline: false },
-            { name: 'Edad', value: payload.age ? `${payload.age} a√±os` : '‚Äî', inline: true },
-            { name: 'Locaci√≥n', value: payload.location, inline: true },
+            { name: 'Score', value: `**${payload.total_score}/50** · ${verdictLabel[verdict.cssClass]}`, inline: false },
+            { name: '📞 Teléfono', value: candidatePhone || '—', inline: false },
+            { name: 'Edad', value: payload.age ? `${payload.age} años` : '—', inline: true },
+            { name: 'Locación', value: payload.location, inline: true },
             { name: 'Entrevistador', value: payload.interviewer, inline: true },
-            { name: 'Duraci√≥n', value: payload.duration_minutes ? `${payload.duration_minutes} min` : '‚Äî', inline: true },
+            { name: 'Duración', value: payload.duration_minutes ? `${payload.duration_minutes} min` : '—', inline: true },
             { name: 'Detalle', value: breakdown, inline: false },
-            { name: 'Notas', value: (payload.notes || '‚Äî').slice(0, 1000), inline: false }
+            { name: 'Notas', value: (payload.notes || '—').slice(0, 1000), inline: false }
           ],
-          footer: { text: `AR Recruitment Scorecard ¬∑ ${dateNice}` },
+          footer: { text: `AR Recruitment Scorecard · ${dateNice}` },
           timestamp: new Date().toISOString()
         }]
       };
