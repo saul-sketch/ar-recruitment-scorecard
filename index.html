@@ -8,6 +8,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>AR Recruitment Scorecard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <style>
     :root {
       --primary: #0f172a;
@@ -190,6 +191,18 @@
       0%, 100% { box-shadow: 0 0 0 0 rgba(15,23,42,0.45); }
       50%      { box-shadow: 0 0 0 8px rgba(15,23,42,0); }
     }
+    .g-btn {
+      width: 100%; min-height: 46px; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 11px 16px; background: white; color: var(--gray-800); border: 1.5px solid var(--gray-300); border-radius: 10px;
+      font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s, border-color 0.15s, transform 0.05s;
+    }
+    .g-btn:hover, .g-btn:focus-visible { background: var(--gray-50); border-color: var(--gray-400); outline: none; }
+    .g-btn:active { transform: scale(0.98); }
+    .g-btn:disabled { opacity: 0.6; cursor: default; }
+    .g-btn svg { width: 20px; height: 20px; flex: 0 0 auto; }
+    .g-status { margin-top: 10px; min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 6px 6px 14px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; font-size: 13px; font-weight: 600; color: #065f46; }
+    .g-status button { min-height: 36px; padding: 6px 12px; border: none; border-radius: 8px; background: white; color: var(--gray-700); font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .g-error { margin-top: 10px; background: #fef2f2; color: var(--accent); padding: 10px 14px; border-radius: 8px; font-size: 13px; border: 1px solid #fecaca; }
     .login-error {
       background: #fef2f2;
       color: var(--accent);
@@ -556,6 +569,9 @@
           <select id="intake-interviewer" class="field-select" onchange="onInterviewerChange()">
             <option value="">Cargando…</option>
           </select>
+          <button type="button" class="g-btn" id="g-btn" onclick="signInGoogle()"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span>Entrar con Google</span></button>
+          <div class="g-status" id="g-status" style="display:none;"><span>✓ Conectado con Google como Saúl</span><button type="button" onclick="signOutGoogle()">Salir</button></div>
+          <div class="g-error" id="g-error" style="display:none;"></div>
         </div>
 
         <div class="row-2">
@@ -760,7 +776,74 @@
       document.getElementById('header-date').textContent = formatToday();
       document.getElementById('intake-date').value = formatToday();
       await loadManagers();
+      await checkGoogleLogin();
     });
+
+    // ============== Entrar con Google: solo Saúl (saul@auto-republic.com) ==============
+    // Lo deja como entrevistador "Saul", igual que si lo eligiera en la lista. Los demás siguen igual.
+    const GOOGLE_ALLOWED = 'saul@auto-republic.com';
+    const GOOGLE_USER = 'Saul';
+    let sbAuth = null;
+    try {
+      if (window.supabase && window.supabase.createClient) {
+        sbAuth = window.supabase.createClient(SUPA_URL, SUPA_ANON, { auth: { persistSession: true, detectSessionInUrl: true, autoRefreshToken: true, storageKey: 'ar-recruitment-scorecard-google' } });
+      }
+    } catch (e) { sbAuth = null; }
+
+    function cleanOAuthUrl() {
+      try {
+        if (/access_token=|error_description=|error=/.test(location.hash) || /[?&](code|error)=/.test(location.search)) {
+          const url = new URL(location.href); url.hash = '';
+          ['code', 'error', 'error_code', 'error_description'].forEach(k => url.searchParams.delete(k));
+          history.replaceState(history.state, '', url.pathname + url.search);
+        }
+      } catch (e) {}
+    }
+    function showGoogleError(msg) { const el = document.getElementById('g-error'); el.textContent = msg; el.style.display = msg ? 'block' : 'none'; }
+    function setGoogleUi(signedIn) {
+      document.getElementById('g-btn').style.display = signedIn ? 'none' : '';
+      document.getElementById('g-status').style.display = signedIn ? '' : 'none';
+    }
+
+    async function checkGoogleLogin() {
+      if (!sbAuth) { cleanOAuthUrl(); return; }
+      try {
+        const { data } = await sbAuth.auth.getSession();
+        cleanOAuthUrl();
+        const s = data && data.session;
+        if (!s) return;
+        const email = ((s.user && s.user.email) || '').toLowerCase().trim();
+        if (email === GOOGLE_ALLOWED) {
+          const sel = document.getElementById('intake-interviewer');
+          if (![...sel.options].some(o => o.value === GOOGLE_USER)) {
+            const o = document.createElement('option'); o.value = GOOGLE_USER; o.textContent = GOOGLE_USER; sel.appendChild(o);
+          }
+          sel.value = GOOGLE_USER;
+          sel.classList.remove('invalid');
+          currentUser = GOOGLE_USER;
+          localStorage.setItem('ar_rs_interviewer', GOOGLE_USER);
+          setGoogleUi(true);
+        } else {
+          try { await sbAuth.auth.signOut(); } catch (e) {}
+          showGoogleError('Este correo no tiene acceso');
+        }
+      } catch (e) { cleanOAuthUrl(); }
+    }
+
+    async function signInGoogle() {
+      showGoogleError('');
+      if (!sbAuth) { showGoogleError('No se pudo cargar Google. Recarga la página.'); return; }
+      const b = document.getElementById('g-btn'); b.disabled = true;
+      try {
+        const { error } = await sbAuth.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname, queryParams: { prompt: 'select_account', hd: 'auto-republic.com' } } });
+        if (error) throw error;
+      } catch (e) { b.disabled = false; showGoogleError('No se pudo abrir Google: ' + (e.message || e)); }
+    }
+
+    async function signOutGoogle() {
+      try { if (sbAuth) await sbAuth.auth.signOut(); } catch (e) {}
+      setGoogleUi(false);
+    }
 
     async function loadManagers() {
       try {
