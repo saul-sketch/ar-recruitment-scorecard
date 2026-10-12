@@ -547,15 +547,30 @@
       text-align: center;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    /* Custom dropdown (replaces the phone's default list). The real <select> stays hidden underneath,
+       so every value read/write and onchange in the app keeps working exactly as before. */
+    .cdd { position: relative; width: 100%; }
+    .cdd-native { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0 0 0 0) !important; white-space: nowrap !important; border: 0 !important; opacity: 0 !important; pointer-events: none !important; }
+    .cdd-trigger { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; text-align: left; cursor: pointer; color: var(--gray-900); }
+    .cdd-trigger .cdd-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cdd-trigger .cdd-label.placeholder { color: var(--gray-500); }
+    .cdd-trigger svg { flex: 0 0 auto; width: 12px; height: 8px; color: var(--gray-500); transition: transform 0.15s; }
+    .cdd.open .cdd-trigger { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(15,23,42,0.1); }
+    .cdd.open .cdd-trigger svg { transform: rotate(180deg); }
+    .cdd-list { position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 60; background: white; border: 1.5px solid var(--gray-200); border-radius: 12px; box-shadow: var(--shadow-lg); padding: 6px; max-height: 280px; overflow-y: auto; overscroll-behavior: contain; display: none; scrollbar-width: thin; }
+    .cdd.open .cdd-list { display: block; }
+    .cdd.up .cdd-list { top: auto; bottom: calc(100% + 6px); }
+    .cdd-opt { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; padding: 10px 12px; border-radius: 8px; font-size: 15px; color: var(--gray-800); cursor: pointer; user-select: none; }
+    .cdd-opt.placeholder { color: var(--gray-500); }
+    .cdd-opt.active { background: var(--gray-100); }
+    .cdd-opt[aria-selected="true"] { font-weight: 700; color: var(--primary); }
+    .cdd-opt[aria-selected="true"]::after { content: '✓'; font-weight: 800; }
+    @media (hover: hover) { .cdd-opt:hover { background: var(--gray-100); } }
+
     /* ===== Phones (and touch screens in landscape): finger-sized, readable, no iOS zoom. Desktop untouched. ===== */
     @media (max-width: 767px), (pointer: coarse) {
       .field-input, .field-select { font-size: 16px; }
       #interview-notes { font-size: 16px !important; }
-      .field-select {
-        padding-right: 40px;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2364748b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-        background-repeat: no-repeat; background-position: right 14px center; background-size: 12px 8px;
-      }
       .pill-btn { min-height: 44px; }
       .g-status button { min-height: 40px; }
       .btn { min-height: 48px; }
@@ -795,7 +810,96 @@
     let questionOrder = [];
 
     // ============== Boot ==============
+    // ============== Custom dropdowns ==============
+    // Wraps a <select>: the select stays (hidden) as the source of truth, so code that reads/sets
+    // .value, rebuilds its options or listens to onchange keeps working unchanged.
+    function enhanceSelect(sel) {
+      if (!sel || sel._cdd) return;
+      const wrap = document.createElement('div'); wrap.className = 'cdd';
+      sel.parentNode.insertBefore(wrap, sel); wrap.appendChild(sel);
+      const listId = sel.id + '-cdd-list';
+      const btn = document.createElement('button'); btn.type = 'button';
+      btn.setAttribute('aria-haspopup', 'listbox'); btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', listId);
+      btn.innerHTML = '<span class="cdd-label"></span><svg viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      const list = document.createElement('div'); list.className = 'cdd-list'; list.id = listId; list.setAttribute('role', 'listbox'); list.tabIndex = -1;
+      const lbl = wrap.parentNode.querySelector('.field-label');
+      if (lbl) { if (!lbl.id) lbl.id = sel.id + '-cdd-lbl'; btn.setAttribute('aria-labelledby', lbl.id + ' ' + sel.id + '-cdd-val'); list.setAttribute('aria-labelledby', lbl.id); lbl.addEventListener('click', () => btn.focus()); }
+      btn.querySelector('.cdd-label').id = sel.id + '-cdd-val';
+      wrap.appendChild(btn); wrap.appendChild(list);
+      sel.classList.add('cdd-native'); sel.tabIndex = -1; sel.setAttribute('aria-hidden', 'true');
+      let active = -1;
+      const proto = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+      const syncClass = () => { btn.className = sel.className.replace(/\bcdd-native\b/, '').trim() + ' cdd-trigger'; };
+      const render = () => {
+        const opts = [...sel.options];
+        const cur = sel.selectedIndex >= 0 ? opts[sel.selectedIndex] : null;
+        const l = btn.querySelector('.cdd-label');
+        l.textContent = cur ? cur.textContent : '';
+        l.classList.toggle('placeholder', !cur || cur.value === '');
+        list.innerHTML = '';
+        opts.forEach((o, i) => {
+          const d = document.createElement('div');
+          d.className = 'cdd-opt' + (o.value === '' ? ' placeholder' : '');
+          d.id = sel.id + '-cdd-opt-' + i; d.setAttribute('role', 'option');
+          d.setAttribute('aria-selected', i === sel.selectedIndex ? 'true' : 'false');
+          d.textContent = o.textContent;
+          d.addEventListener('click', e => { e.stopPropagation(); choose(i); });
+          list.appendChild(d);
+        });
+        syncClass();
+      };
+      const setActive = i => {
+        const items = list.children; if (!items.length) return;
+        active = Math.max(0, Math.min(items.length - 1, i));
+        [...items].forEach((it, k) => it.classList.toggle('active', k === active));
+        btn.setAttribute('aria-activedescendant', items[active].id);
+        const it = items[active];
+        if (it.offsetTop < list.scrollTop) list.scrollTop = it.offsetTop - 6;
+        else if (it.offsetTop + it.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = it.offsetTop + it.offsetHeight - list.clientHeight + 6;
+      };
+      const open = () => {
+        if (wrap.classList.contains('open')) return;
+        document.querySelectorAll('.cdd.open').forEach(w => w._cddClose && w._cddClose());
+        render();
+        wrap.classList.remove('up'); wrap.classList.add('open'); btn.setAttribute('aria-expanded', 'true');
+        const r = btn.getBoundingClientRect(), lh = Math.min(list.scrollHeight, 280) + 8;
+        if (r.bottom + lh > window.innerHeight && r.top - lh > 0) wrap.classList.add('up');
+        setActive(sel.selectedIndex >= 0 ? sel.selectedIndex : 0);
+      };
+      const close = () => { wrap.classList.remove('open', 'up'); btn.setAttribute('aria-expanded', 'false'); btn.removeAttribute('aria-activedescendant'); };
+      wrap._cddClose = close;
+      const choose = i => {
+        const changed = i !== sel.selectedIndex;
+        proto.set.call(sel, sel.options[i].value);
+        render(); close(); btn.focus();
+        if (changed) sel.dispatchEvent(new Event('change', { bubbles: true }));
+      };
+      btn.addEventListener('click', () => wrap.classList.contains('open') ? close() : open());
+      btn.addEventListener('keydown', e => {
+        const isOpen = wrap.classList.contains('open');
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (!isOpen) open(); else setActive(active + (e.key === 'ArrowDown' ? 1 : -1)); }
+        else if (e.key === 'Home' && isOpen) { e.preventDefault(); setActive(0); }
+        else if (e.key === 'End' && isOpen) { e.preventDefault(); setActive(list.children.length - 1); }
+        else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (isOpen) choose(active); else open(); }
+        else if (e.key === 'Escape' && isOpen) { e.preventDefault(); e.stopPropagation(); close(); }
+        else if (e.key === 'Tab' && isOpen) close();
+        else if (e.key.length === 1 && isOpen) {
+          const k = e.key.toLowerCase(), opts = [...sel.options];
+          for (let n = 1; n <= opts.length; n++) { const j = (active + n) % opts.length; if (opts[j].textContent.trim().toLowerCase().startsWith(k)) { setActive(j); break; } }
+        }
+      });
+      // Programmatic writes (sel.value = …) and option rebuilds update the custom box too.
+      Object.defineProperty(sel, 'value', { configurable: true, get() { return proto.get.call(sel); }, set(v) { proto.set.call(sel, v); render(); } });
+      new MutationObserver(render).observe(sel, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+      sel._cdd = { render, close };
+      render();
+    }
+    document.addEventListener('pointerdown', e => {
+      document.querySelectorAll('.cdd.open').forEach(w => { if (!w.contains(e.target)) w._cddClose(); });
+    });
+
     document.addEventListener('DOMContentLoaded', async () => {
+      enhanceSelect(document.getElementById('intake-interviewer'));
       document.getElementById('header-date').textContent = formatToday();
       document.getElementById('intake-date').value = formatToday();
       await loadManagers();
