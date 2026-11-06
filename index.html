@@ -1264,7 +1264,7 @@
       try {
         const res = await fetch(`${SUPA_URL}/rest/v1/ar_interview_scorecards`, {
           method: 'POST',
-          headers: { ...SUPA_HEADERS, Prefer: 'return=representation' },
+          headers: { ...SUPA_HEADERS, Prefer: 'return=minimal' },
           body: JSON.stringify(payload),
           signal: ctrl.signal
         });
