@@ -771,10 +771,6 @@
     const SUPA_HEADERS = { apikey: SUPA_ANON, Authorization: `Bearer ${SUPA_ANON}`, 'Content-Type': 'application/json' };
     const BENCHMARK_PASS = 35;       // ≥35/50 → pasa
     const BENCHMARK_BORDERLINE = 28;  // 28–34 → borderline (Saúl decide)
-    const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1507469284299903036/0XkuWm9jSZSRjCZkYv4xn5mqS_E-Gk2Eeu_fOc9HxUMLCpLxIsipzzHzEt9lepUULBW8';
-    const DISCORD_USER_HEADHUNTER = '1467993058158186678';
-    const DISCORD_USER_SAUL = '1242195465760542723';
-    const DISCORD_USER_CHARLES = '1468206071133900915';
 
     // ============== Questions (8 random + 2 fixed at end) ==============
     const QUESTIONS_RANDOM = [
@@ -1271,8 +1267,7 @@
         clearTimeout(tid);
         if (!res.ok) throw new Error(await res.text());
 
-        // Fire Discord notification (best-effort, no blocking on failure)
-        postToDiscord(payload, verdict, interview.phone).catch(err => console.warn('Discord notify failed:', err));
+        // Discord: lo publica el servidor (función sales-report-discord, cada 2 min).
 
         document.getElementById('sent-sub').innerHTML = verdict.passed
           ? `Score <b>${total}/50</b> — pasó el benchmark. Saúl recibirá la notificación para agendar reunión con <b>${escapeHtml(interview.candidateName)}</b>.`
@@ -1290,80 +1285,6 @@
         // ALWAYS reset button — never leave it stuck on "Enviando…"
         btn.disabled = false;
         btn.textContent = 'Enviar evaluación';
-      }
-    }
-
-    async function postToDiscord(payload, verdict, candidatePhone) {
-      // Colors
-      const colorMap = {
-        pass: 1102505,        // green
-        borderline: 16092171, // amber
-        fail: 15679044        // red
-      };
-      const emojiMap = {
-        pass: '✅', borderline: '⚠️', fail: '❌'
-      };
-      const verdictLabel = {
-        pass: 'Aprobado — Agendar con Saúl',
-        borderline: 'Borderline — Saúl decide',
-        fail: 'No pasa'
-      };
-
-      // Score breakdown line (Q1..Q10 in canonical order)
-      const scoreMap = {};
-      (payload.scores || []).forEach(s => { scoreMap[s.question_id] = s.score; });
-      const breakdown = [1,2,3,4,5,6,7,8,9,10]
-        .map(qid => `Q${qid}=${scoreMap[qid] ?? '–'}`)
-        .join(' · ');
-
-      const dateNice = new Date().toLocaleDateString('es-ES', { day:'numeric', month:'long', year:'numeric' });
-
-      // Mention strategy:
-      //  PASS       → headhunter + Saúl + Charles (coordinar agendar)
-      //  BORDERLINE → headhunter + Saúl + Charles (Saúl/Charles deciden)
-      //  FAIL       → solo headhunter (no molestar a Saúl/Charles)
-      let mentionIds = [];
-      let mentionText = '';
-      if (verdict.cssClass === 'pass' || verdict.cssClass === 'borderline') {
-        mentionIds = [DISCORD_USER_HEADHUNTER, DISCORD_USER_SAUL, DISCORD_USER_CHARLES];
-        mentionText = `<@${DISCORD_USER_HEADHUNTER}> <@${DISCORD_USER_SAUL}> <@${DISCORD_USER_CHARLES}>`;
-      } else {
-        mentionIds = [DISCORD_USER_HEADHUNTER];
-        mentionText = `<@${DISCORD_USER_HEADHUNTER}>`;
-      }
-
-      const body = {
-        content: mentionText,
-        allowed_mentions: { users: mentionIds },
-        embeds: [{
-          title: `${emojiMap[verdict.cssClass]} Nueva entrevista — ${payload.candidate_name}`,
-          color: colorMap[verdict.cssClass] || 1102505,
-          fields: [
-            { name: 'Score', value: `**${payload.total_score}/50** · ${verdictLabel[verdict.cssClass]}`, inline: false },
-            { name: '📞 Teléfono', value: candidatePhone || '—', inline: false },
-            { name: 'Edad', value: payload.age ? `${payload.age} años` : '—', inline: true },
-            { name: 'Locación', value: payload.location, inline: true },
-            { name: 'Entrevistador', value: payload.interviewer, inline: true },
-            { name: 'Duración', value: payload.duration_minutes ? `${payload.duration_minutes} min` : '—', inline: true },
-            { name: 'Detalle', value: breakdown, inline: false },
-            { name: 'Notas', value: (payload.notes || '—').slice(0, 1000), inline: false }
-          ],
-          footer: { text: `AR Recruitment Scorecard · ${dateNice}` },
-          timestamp: new Date().toISOString()
-        }]
-      };
-
-      const dctrl = new AbortController();
-      const dtid = setTimeout(() => dctrl.abort(), 8000);
-      try {
-        await fetch(DISCORD_WEBHOOK, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-          signal: dctrl.signal
-        });
-      } finally {
-        clearTimeout(dtid);
       }
     }
 
